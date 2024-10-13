@@ -305,6 +305,7 @@ func (repo *repository) Manifests(ctx context.Context, options ...distribution.M
 				blobStore:  repo.blobStore,
 				repository: repo,
 				pathFn:     subjectReferrerLinkPath,
+				rootPathFn: subjectReferrerRootPath,
 			},
 		},
 		ocischemaIndexHandler: &ocischemaIndexHandler{

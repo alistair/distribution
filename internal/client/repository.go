@@ -385,6 +385,11 @@ type manifests struct {
 	etags  map[string]string
 }
 
+func (ms *manifests) EnumerateReferrer(ctx context.Context, dgst digest.Digest, artifactType string, ingester func(distribution.Manifest) error) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (ms *manifests) Exists(ctx context.Context, dgst digest.Digest) (bool, error) {
 	ref, err := reference.WithDigest(ms.name, dgst)
 	if err != nil {

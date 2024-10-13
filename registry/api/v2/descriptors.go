@@ -77,6 +77,16 @@ var (
 		},
 	}
 
+	ociFiltersAppliedHeader = ParameterDescriptor{
+		Name:        "OCI-Filters-Applied",
+		Type:        "string",
+		Description: "Comma seperated list of applied filters",
+		Format:      "",
+		Examples: []string{
+			"application/vnd.example.xsbom.v1",
+		},
+	}
+
 	contentLengthZeroHeader = ParameterDescriptor{
 		Name:        "Content-Length",
 		Description: "The `Content-Length` header must be zero and the body must be empty.",
@@ -395,6 +405,40 @@ type ParameterDescriptor struct {
 }
 
 var routeDescriptors = []RouteDescriptor{
+	{
+		Name:        RouteNameReferrers,
+		Path:        "/v2/{name:" + reference.NameRegexp.String() + "}/referrers/{digest:" + reference.DigestRegexp.String() + "}",
+		Entity:      "Referrer",
+		Description: "",
+		Methods: []MethodDescriptor{
+			{
+				Method:      http.MethodGet,
+				Description: "",
+				Requests: []RequestDescriptor{
+					{
+						Headers: []ParameterDescriptor{
+							hostHeader,
+							authHeader,
+						},
+						Successes: []ResponseDescriptor{
+							{
+								Description: "The API implements the referrers api and is successful",
+								StatusCode:  http.StatusOK,
+							},
+						},
+						Failures: []ResponseDescriptor{
+							{
+								Description: "The registry does not implement the V2 API.",
+								StatusCode:  http.StatusNotFound,
+							},
+							unauthorizedResponseDescriptor,
+							tooManyRequestsDescriptor,
+						},
+					},
+				},
+			},
+		},
+	},
 	{
 		Name:        RouteNameBase,
 		Path:        "/v2/",

@@ -2990,6 +2990,7 @@ func TestArtifactManifest(t *testing.T) {
 
 			// When an artifact manifest has been PUT it can be retrieved with GET.
 			location := res.Header.Get("Location")
+
 			req, err = http.NewRequest(http.MethodGet, location, nil)
 			if err != nil {
 				t.Fatalf("Failed to create artifact GET request: %s", err)
@@ -3023,6 +3024,19 @@ func TestArtifactManifest(t *testing.T) {
 			if !reflect.DeepEqual(gotManifest, payload) {
 				t.Errorf("Pulled manifest does not match pushed manifest, got:\n%s\nexpected:\n%s", string(gotManifest), string(payload))
 			}
+
+			subject, err := reference.WithDigest(repo, referrer.Subject().Digest)
+			location, err = testEnv.builder.BuildReferrerURL(subject)
+			if err != nil {
+				t.Fatalf("error creating request for %s: %v", "referrers", err)
+			}
+
+			req, err = http.NewRequest(http.MethodGet, fmt.Sprintf(location), strings.NewReader(""))
+			if err != nil {
+				t.Fatalf("error creating request for %s: %v", "referrers", err)
+			}
+			resp, err := http.DefaultClient.Do(req)
+			_ = resp
 
 			if test.deleteSubject {
 				// When a subject is deleted, it's referrers link remains
@@ -3173,6 +3187,7 @@ func TestDockerManifestWithSubject(t *testing.T) {
 	// TODO(brackendawson): We should now try to get referrers for the subject
 	// (which should also eventually exist for that to work), but those APIs
 	// don't exist yet so for now just check the link was not made.
+
 	_, err = testEnv.app.driver.Stat(context.Background(), fmt.Sprintf("/docker/registry/v2/repositories/%s/_manifests/revisions/sha256/%s/_referrers",
 		repo.Name(), res.Header.Get("Docker-Content-Digest")))
 	var expectedErr storagedriver.InvalidPathError
