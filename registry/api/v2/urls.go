@@ -162,6 +162,27 @@ func (ub *URLBuilder) BuildManifestURL(ref reference.Named) (string, error) {
 	return manifestURL.String(), nil
 }
 
+func (ub *URLBuilder) BuildReferrerURL(ref reference.Named) (string, error) {
+	route := ub.cloneRoute(RouteNameReferrers)
+
+	digest := ""
+	switch v := ref.(type) {
+	case reference.Tagged:
+		return "", fmt.Errorf("reference must have a digest")
+	case reference.Digested:
+		digest = v.Digest().String()
+	default:
+		return "", fmt.Errorf("reference must have a digest")
+	}
+
+	manifestURL, err := route.URL("name", ref.Name(), "digest", digest)
+	if err != nil {
+		return "", err
+	}
+
+	return manifestURL.String(), nil
+}
+
 // BuildBlobURL constructs the url for the blob identified by name and dgst.
 func (ub *URLBuilder) BuildBlobURL(ref reference.Canonical) (string, error) {
 	route := ub.cloneRoute(RouteNameBlob)

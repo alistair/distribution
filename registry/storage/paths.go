@@ -255,6 +255,17 @@ func pathFor(spec pathSpec) (string, error) {
 		return path.Join(append(repoPrefix, v.name, "_uploads", v.id, "hashstates", string(v.alg), offset)...), nil
 	case repositoriesRootPathSpec:
 		return path.Join(repoPrefix...), nil
+	case subjectReferrerRootPathSpec:
+		manifestPath, err := pathFor(manifestRevisionPathSpec{name: v.name, revision: v.subject})
+		if err != nil {
+			return "", err
+		}
+		p := path.Join(manifestPath, "_referrers")
+		if v.mediaType != "" {
+			p = path.Join(p, v.mediaType)
+		}
+		return p, nil
+
 	case subjectReferrerLinkPathSpec:
 		manifestPath, err := pathFor(manifestRevisionPathSpec{name: v.name, revision: v.subject})
 		if err != nil {
@@ -478,6 +489,14 @@ type subjectReferrerLinkPathSpec struct {
 }
 
 func (subjectReferrerLinkPathSpec) pathSpec() {}
+
+type subjectReferrerRootPathSpec struct {
+	name      string
+	subject   digest.Digest
+	mediaType string
+}
+
+func (subjectReferrerRootPathSpec) pathSpec() {}
 
 // digestPathComponents provides a consistent path breakdown for a given
 // digest. For a generic digest, it will be as follows:
