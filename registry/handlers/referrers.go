@@ -1,15 +1,16 @@
 package handlers
 
 import (
-	"encoding/json"
+	"net/http"
+
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/internal/dcontext"
+	"github.com/distribution/distribution/v3/manifest/ocischema"
 	"github.com/gorilla/handlers"
 	"github.com/opencontainers/go-digest"
 	"github.com/opencontainers/image-spec/specs-go"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 // referrersDispatcher takes the request context and builds the
@@ -51,28 +52,26 @@ func (rh *referrersHandler) GetManifest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	manifestList := make([]distribution.Manifest, 0)
+	manifestList := make([]v1.Descriptor, 0)
 
 	//TODO Implement filtering my artifactType
-	err = manifestEnumerator.EnumerateReferrer(rh.Context, rh.Digest, "", func(manifest distribution.Manifest) error {
-		manifestList = append(manifestList, manifest)
+	err = manifestEnumerator.EnumerateReferrer(rh.Context, rh.Digest, "", func(desc v1.Descriptor) error {
+		manifestList = append(manifestList, desc)
 		return nil
 	})
 	if err != nil {
 		return
 	}
 
-	referrersApiResponse := responseIndex{
-		Versioned:    specs.Versioned{SchemaVersion: 2},
-		MediaType:    v1.MediaTypeImageIndex,
-		ArtifactType: "",
-		Manifests:    manifestList,
-	}
-
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(referrersApiResponse); err != nil {
+	s, err = ocischema.FromDescriptors(manifestList, nil)
+	if err != nil {
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Add("Content-Type", v1.MediaTypeImageIndex)
+	w.Write(s.Payload())
+
 	return
 }
 
