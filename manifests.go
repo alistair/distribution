@@ -62,7 +62,7 @@ type ManifestEnumerator interface {
 }
 
 type ManifestReferrerEnumerator interface {
-	EnumerateReferrer(ctx context.Context, subject digest.Digest, artifactType string, ingester func(Manifest) error) error
+	EnumerateReferrer(ctx context.Context, subject digest.Digest, artifactType string, ingester func(v1.Descriptor) error) error
 }
 
 // Describable is an interface for descriptors.

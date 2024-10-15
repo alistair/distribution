@@ -108,10 +108,6 @@ func fromDescriptorsWithMediaType(descriptors []v1.Descriptor, subject *v1.Descr
 		Annotations: annotations,
 	}
 
-	if subject != nil {
-		m.ArtifactType = "application/text"
-	}
-
 	m.Manifests = make([]v1.Descriptor, len(descriptors))
 	copy(m.Manifests, descriptors)
 
