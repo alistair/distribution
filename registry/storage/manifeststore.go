@@ -164,3 +164,21 @@ func (ms *manifestStore) Enumerate(ctx context.Context, ingester func(digest.Dig
 	})
 	return err
 }
+
+func (ms *manifestStore) EnumerateReferrer(ctx context.Context, dgst digest.Digest, artifactType string, ingester func(v1.Descriptor) error) error {
+	handler := ms.ocischemaHandler.(*ocischemaManifestHandler)
+
+	err := handler.references.Enumerate(ctx, dgst, artifactType, func(d digest.Digest) error {
+		desc, err := ms.blobStore.statter.Stat(ctx, d)
+		if err != nil {
+			// If we can't find the manifest just skip from output
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		ingester(desc)
+		return nil
+	})
+	return err
+}

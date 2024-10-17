@@ -301,6 +301,12 @@ func (repo *repository) Manifests(ctx context.Context, options ...distribution.M
 			repository:   repo,
 			blobStore:    blobStore,
 			manifestURLs: repo.registry.manifestURLs,
+			references: &referenceHandler{
+				blobStore:  repo.blobStore,
+				repository: repo,
+				pathFn:     subjectReferrerLinkPath,
+				rootPathFn: subjectReferrerRootPath,
+			},
 		},
 		ocischemaIndexHandler: &ocischemaIndexHandler{
 			manifestListHandler: manifestListHandler,
