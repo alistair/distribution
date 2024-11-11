@@ -68,9 +68,6 @@ type ImageIndex struct {
 	// Subject is the descriptor of a manifest referred to by this manifest.
 	Subject *v1.Descriptor `json:"subject,omitempty"`
 
-	// Subject is an optional link from the image manifest to another manifest forming an association between the image manifest and the other manifest.
-	Subject distribution.Descriptor `json:"subject,omitempty"`
-
 	// Annotations is an optional field that contains arbitrary metadata for the
 	// image index
 	Annotations map[string]string `json:"annotations,omitempty"`

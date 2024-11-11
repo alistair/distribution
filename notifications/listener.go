@@ -93,7 +93,7 @@ type manifestServiceListener struct {
 	parent *repositoryListener
 }
 
-func (msl *manifestServiceListener) EnumerateReferrer(ctx context.Context, subject digest.Digest, artifactType string, ingester func(distribution.Manifest) error) error {
+func (msl *manifestServiceListener) EnumerateReferrer(ctx context.Context, subject digest.Digest, artifactType string, ingester func(v1.Descriptor) error) error {
 	enumerator := msl.ManifestService.(distribution.ManifestReferrerEnumerator)
 
 	return enumerator.EnumerateReferrer(ctx, subject, artifactType, ingester)
