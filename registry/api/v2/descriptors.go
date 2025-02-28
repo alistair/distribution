@@ -406,40 +406,6 @@ type ParameterDescriptor struct {
 
 var routeDescriptors = []RouteDescriptor{
 	{
-		Name:        RouteNameReferrers,
-		Path:        "/v2/{name:" + reference.NameRegexp.String() + "}/referrers/{digest:" + reference.DigestRegexp.String() + "}",
-		Entity:      "Referrer",
-		Description: "",
-		Methods: []MethodDescriptor{
-			{
-				Method:      http.MethodGet,
-				Description: "",
-				Requests: []RequestDescriptor{
-					{
-						Headers: []ParameterDescriptor{
-							hostHeader,
-							authHeader,
-						},
-						Successes: []ResponseDescriptor{
-							{
-								Description: "The API implements the referrers api and is successful",
-								StatusCode:  http.StatusOK,
-							},
-						},
-						Failures: []ResponseDescriptor{
-							{
-								Description: "The registry does not implement the V2 API.",
-								StatusCode:  http.StatusNotFound,
-							},
-							unauthorizedResponseDescriptor,
-							tooManyRequestsDescriptor,
-						},
-					},
-				},
-			},
-		},
-	},
-	{
 		Name:        RouteNameBase,
 		Path:        "/v2/",
 		Entity:      "Base",
@@ -1573,6 +1539,40 @@ var routeDescriptors = []RouteDescriptor{
 							unauthorizedResponseDescriptor,
 							repositoryNotFoundResponseDescriptor,
 							deniedResponseDescriptor,
+							tooManyRequestsDescriptor,
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		Name:        RouteNameReferrers,
+		Path:        "/v2/{name:" + reference.NameRegexp.String() + "}/referrers/{digest:" + reference.DigestRegexp.String() + "}",
+		Entity:      "Referrer",
+		Description: "",
+		Methods: []MethodDescriptor{
+			{
+				Method:      http.MethodGet,
+				Description: "",
+				Requests: []RequestDescriptor{
+					{
+						Headers: []ParameterDescriptor{
+							hostHeader,
+							authHeader,
+						},
+						Successes: []ResponseDescriptor{
+							{
+								Description: "The API implements the referrers api and is successful",
+								StatusCode:  http.StatusOK,
+							},
+						},
+						Failures: []ResponseDescriptor{
+							{
+								Description: "The registry does not implement the V2 API.",
+								StatusCode:  http.StatusNotFound,
+							},
+							unauthorizedResponseDescriptor,
 							tooManyRequestsDescriptor,
 						},
 					},
