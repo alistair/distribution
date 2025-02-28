@@ -22,13 +22,19 @@ permissions:
 
 jobs:
   test:
+    env:
+      # Setting GOTOOLCHAIN to local tells go
+      # to to use the bundled Go version rather
+      # than fetching the toolchain according to
+      # toolchain directive found in go.mod.
+      GOTOOLCHAIN: local
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         go:
-          - 1.21.12
-          - 1.22.5
+          - 1.22.12
+          - 1.23.6
         target:
           - test-coverage
           - test-cloud-storage
@@ -47,7 +53,7 @@ jobs:
           make ${{ matrix.target }}
       -
         name: Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           directory: ./
 
@@ -112,8 +118,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build artifacts
-        uses: docker/bake-action@v5
+        uses: docker/bake-action@v6
         with:
+          source: .
           targets: artifact-all
       -
         name: Rename provenance
@@ -133,15 +140,16 @@ jobs:
           tree -nh ./bin
       -
         name: Upload artifacts
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: registry
           path: ./bin/*
           if-no-files-found: error
       -
         name: Build image
-        uses: docker/bake-action@v5
+        uses: docker/bake-action@v6
         with:
+          source: .
           files: |
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
